@@ -26,9 +26,10 @@ module.exports = (() => {
         pendingRequest = requestFunc;
         setTimeout(() => {
             if(pendingRequest) {
-                if(prevRequestTime === pending.requestTime) {
+                let nowTime = (new Date()).getTime();
+                if(nowTime - prevRequestTime >= DELAY_TIME) {
                     pendingRequest().then(() => {
-                        if(pendding) {
+                        if(pendding && prevRequestTime === pending.requestTime) {
                             pendding.successFunc();
                             pending = null;
                         }
