@@ -3,6 +3,7 @@ const DELAY_TIME = 500;
 module.exports = (() => {
     let pendingProcess;
 
+    let pending;
     let pendingRequest;
     let prevRequestTime = (new Date()).getTime();
 
@@ -17,17 +18,19 @@ module.exports = (() => {
     }
 
     let callReduceRequest = (requestFunc, successFunc) => {
-        pendingProcess = successFunc;
-        pendingRequest = requestFunc;
         prevRequestTime = (new Date()).getTime();
+        pending = {
+            successFunc,
+            requestTime: prevRequestTime
+        };
+        pendingRequest = requestFunc;
         setTimeout(() => {
             if(pendingRequest) {
-                let nowTime = (new Date()).getTime();
-                if(nowTime - prevRequestTime >= DELAY_TIME) {
+                if(prevRequestTime === pending.requestTime) {
                     pendingRequest().then(() => {
-                        if(pendingProcess) {
-                            pendingProcess();
-                            pendingProcess = null;
+                        if(pendding) {
+                            pendding.successFunc();
+                            pending = null;
                         }
                     });
                     pendingRequest = null;
