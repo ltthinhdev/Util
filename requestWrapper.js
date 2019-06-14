@@ -18,19 +18,17 @@ module.exports = (() => {
     }
 
     let callReduceRequest = (requestFunc, successFunc) => {
-        prevRequestTime = (new Date()).getTime();
-        pending = {
-            successFunc,
-            requestTime: prevRequestTime
-        };
+        let checkTime = (new Date()).getTime();
+        prevRequestTime = checkTime;
+        pending = successFunc;
         pendingRequest = requestFunc;
         setTimeout(() => {
             if(pendingRequest) {
                 let nowTime = (new Date()).getTime();
                 if(nowTime - prevRequestTime >= DELAY_TIME) {
                     pendingRequest().then(() => {
-                        if(pendding && prevRequestTime === pending.requestTime) {
-                            pendding.successFunc();
+                        if(pendding && prevRequestTime === checkTime) {
+                            pendding();
                             pending = null;
                         }
                     });
